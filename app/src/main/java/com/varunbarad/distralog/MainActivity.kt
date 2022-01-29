@@ -1,5 +1,8 @@
 package com.varunbarad.distralog
 
+import android.app.ActivityManager
+import android.graphics.BitmapFactory
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.databinding.DataBindingUtil
@@ -25,6 +28,20 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         viewBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         setSupportActionBar(viewBinding.toolbar)
+
+        val taskDescription = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            ActivityManager.TaskDescription(
+                getString(R.string.title_activity_main),
+                R.drawable.ic_launcher,
+            )
+        } else {
+            val icon = BitmapFactory.decodeResource(resources, R.drawable.ic_launcher)
+            ActivityManager.TaskDescription(
+                getString(R.string.title_activity_main),
+                icon,
+            )
+        }
+        setTaskDescription(taskDescription)
     }
 
     override fun onStart() {
@@ -75,7 +92,8 @@ class MainActivity : AppCompatActivity() {
 
                     val lastEntryText = if (lastEntry != null) {
                         val lastEntryWasToday = lastEntry.createdAt.toLocalDate() == today
-                        val lastEntryWasYesterday = lastEntry.createdAt.toLocalDate().plusDays(1) == today
+                        val lastEntryWasYesterday =
+                            lastEntry.createdAt.toLocalDate().plusDays(1) == today
 
                         when {
                             lastEntryWasToday -> timeFormatter.format(lastEntry.createdAt)
